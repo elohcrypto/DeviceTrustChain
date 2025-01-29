@@ -1,22 +1,23 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const baseURI = "ipfs://"; // Customize this
-  const [deployer] = await ethers.getSigners();
+  const CONTRACT_ADDRESS = "0xYourContractAddress";
+  const contract = await ethers.getContractAt("IoTDeviceNFT", CONTRACT_ADDRESS);
   
-  console.log("Deploying contract with account:", deployer.address);
+  // Example: Grant MINTER_ROLE to another address
+  const [admin] = await ethers.getSigners();
+  const newMinter = "0xAddressToGrantRole";
   
-  const NFT = await ethers.getContractFactory("IoTDeviceNFT");
-  const nft = await NFT.deploy(baseURI);
-  
-  await nft.deployed();
-  console.log("Contract deployed to:", nft.address);
-  
-  // Assign roles (optional)
-  // await nft.grantRole(await nft.MINTER_ROLE(), minterAddress);
+  await contract.grantRole(
+    await contract.MINTER_ROLE(),
+    newMinter
+  );
+  console.log(`Granted MINTER_ROLE to ${newMinter}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch(error => {
+    console.error(error);
+    process.exit(1);
+  });
